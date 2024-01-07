@@ -1,0 +1,17 @@
+peers:
+  - http://localhost:8001
+  - http://localhost:8002
+  - http://localhost:8003
+front-server:
+  http://localhost:9999
+
+http:
+  defaultReplicas : 50
+  defaultBasePath : "/cache/"
+
+api: "cache"
+
+mysql:
+  password: 123456
+  user: root
+  database: CacheDB
