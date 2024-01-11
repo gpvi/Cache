@@ -73,7 +73,7 @@ func (g *Group) Get(key string) (ByteView, error) {
 		return ByteView{}, fmt.Errorf("key is required")
 	}
 	if v, ok := g.mainCache.get(key); ok {
-		log.Println("[GeeCache] hit")
+		log.Println("[LocalCache] hit")
 		return v, nil
 	}
 	// 不在本地的cache中执行加载
@@ -90,7 +90,7 @@ func (g *Group) load(key string) (value ByteView, err error) {
 				if err == nil {
 					return value, nil
 				}
-				log.Println("[GeeCache] Failed to get from peer", err)
+				log.Println("[RemoteCache] Failed to get from peer", err)
 			}
 		}
 		// 本机节点或者远程节点获取失败

@@ -11,6 +11,26 @@ http:
 
 api: "cache"
 
+online-servers:
+  - port: 8001
+    ip: localhost
+    api: false
+
+  - port: 8002
+    ip: localhost
+    api: false
+
+  - port: 8003
+    ip: localhost
+    api: true
+
+redis:
+  addr:
+  port:
+  user:
+  pwd:
+
+
 mysql:
   password: 123456
   user: root
