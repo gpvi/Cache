@@ -21,10 +21,8 @@ func (c *configData) GetApi() string {
 	return config.Api
 }
 
-//func GetOnlineServers() []string {
-//	config := getConfig()
-//
-//	for i := range config.Servers {
-//
-//	}
-//}
+func (c *configData) GetOnlineServers() []Server {
+	config := getConfig(c.path)
+	return config.Servers
+
+}

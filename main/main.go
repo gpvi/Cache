@@ -11,6 +11,7 @@ import (
 	"strconv"
 )
 
+var online_servers []conf.Server
 var config_path = "src/conf/config.yaml"
 var apiAddr string
 var addrMap = make(map[int]string)
@@ -89,15 +90,20 @@ func init() {
 	for _, v := range addrMap {
 		addrs = append(addrs, v)
 	}
-
-	for key, val := range addrMap {
-		log.Println(key, "-->", val)
-	}
+	online_servers = confdata.GetOnlineServers()
+	//for key, val := range addrMap {
+	//	log.Println(key, "-->", val)
+	//}
 
 }
 func main() {
 	var port int
 	var api bool
+	//for _, v := range online_servers {
+	//	println("ip:", v.IP)
+	//	println("port:", v.Port)
+	//	println("api:", v.API)
+	//}
 
 	flag.IntVar(&port, "port", 8001, "Geecache server port")
 	flag.BoolVar(&api, "api", false, "Start a api server?")
