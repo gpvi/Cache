@@ -11,8 +11,9 @@ import (
 	"strconv"
 )
 
+var config_path = "src/conf/config.yaml"
 var apiAddr string
-var addrMap map[int]string
+var addrMap = make(map[int]string)
 var addrs []string
 var db = map[string]string{
 	"Tom":  "630",
@@ -60,9 +61,11 @@ func startAPIServer(apiAddr string, gee *src.Group) {
 }
 func init() {
 	// 配置front-server
-	apiAddr = conf.GetFrontServer()
+	confdata := conf.NewConfigData(config_path)
+	apiAddr = confdata.GetFrontServer()
+	log.Println(apiAddr)
 	// 配置 peers
-	peers := conf.GetPeers()
+	peers := confdata.GetPeers()
 	for _, peer := range peers {
 		parsedURL, err := url.Parse(peer)
 		if err != nil {
@@ -87,10 +90,15 @@ func init() {
 		addrs = append(addrs, v)
 	}
 
+	for key, val := range addrMap {
+		log.Println(key, "-->", val)
+	}
+
 }
 func main() {
 	var port int
 	var api bool
+
 	flag.IntVar(&port, "port", 8001, "Geecache server port")
 	flag.BoolVar(&api, "api", false, "Start a api server?")
 	flag.Parse()
