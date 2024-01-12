@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-var default_port = 80
+var default_port = 8080
 var default_api = false
 var default_ip = "localhost"
 
@@ -19,12 +19,14 @@ type Server struct {
 
 type Config struct {
 	Peers       []string `yaml:"peers"`
-	FrontServer string   `yaml:"front-server"`
+	FrontServer string   `yaml:"front-server omitempty" default:"http://localhost:9999"`
 	Api         string   `yaml:"api"`
 	Servers     []Server `yaml:"online-servers"`
 }
 
-func setDefaults(servers []Server) {
+func (c *Config) setDefaults() {
+	servers := c.Servers
+	var count_num int = 0
 	for i := range servers {
 		// 如果未提供API值，则设置为默认值false
 		if servers[i].API == false {
@@ -34,8 +36,12 @@ func setDefaults(servers []Server) {
 			servers[i].IP = default_ip
 		}
 		if servers[i].Port == 0 {
-			servers[i].Port = default_port
+			servers[i].Port = default_port + count_num
 		}
+		count_num++
+	}
+	if c.FrontServer == "" {
+		c.FrontServer = "http://localhost:9999"
 	}
 }
 func getConfig(configPath string) *Config {
@@ -57,7 +63,7 @@ func getConfig(configPath string) *Config {
 		fmt.Println(err)
 	}
 	// 设置默认值
-	setDefaults(config.Servers)
+	config.setDefaults()
 
 	return &config
 

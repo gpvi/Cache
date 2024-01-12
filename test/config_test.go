@@ -2,6 +2,7 @@ package test
 
 import (
 	"GeeCache/src/conf"
+	"strconv"
 	"testing"
 )
 
@@ -44,12 +45,8 @@ func TestConfig(t *testing.T) {
 	//for k, v := range addrMap {
 	//	println(k, "-->", v)
 	//}
-
 	for _, v := range confdata.GetOnlineServers() {
-		println("ip:", v.IP)
-		println("port:", v.Port)
-		println("api:", v.API)
-
+		println("http://" + v.IP + ":" + strconv.Itoa(v.Port))
 	}
 
 }

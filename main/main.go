@@ -2,24 +2,47 @@ package main
 
 import (
 	"GeeCache/src"
-	"GeeCache/src/conf"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
-	"strconv"
 )
 
-var online_servers []conf.Server
-var config_path = "src/conf/config.yaml"
-var apiAddr string
-var addrMap = make(map[int]string)
-var addrs []string
-var db = map[string]string{
-	"Tom":  "630",
-	"Jack": "589",
-	"Sam":  "567",
+// var Online_servers []conf.Server
+// var Config_path = "src/conf/config.yaml"
+// var ApiAddr string
+// var AddrMap = make(map[int]string)
+// var Addrs []string
+//
+//	var DB = map[string]string{
+//		"Tom":  "630",
+//		"Jack": "589",
+//		"Sam":  "567",
+//	}
+func init() {
+	// 配置front-server
+	//confdata := conf.NewConfigData(Config_path)
+	//ApiAddr = confdata.GetFrontServer()
+	//Online_servers = confdata.GetOnlineServers()
+	//log.Println("ApiAddr:", ApiAddr)
+	//// 配置 peers
+	//// test
+	//var peers []string
+	////var as []string
+	//for _, v := range confdata.GetOnlineServers() {
+	//	str := "http://" + v.IP + ":" + strconv.Itoa(v.Port)
+	//	println(str)
+	//	err := append(peers, str)
+	//	//println("http://" + v.IP + ":" + strconv.Itoa(v.Port))
+	//	if err != nil {
+	//		fmt.Errorf("ip init append error")
+	//		//panic("append error")
+	//	}
+	//	AddrMap[v.Port] = str
+	//	//append(as, )
+	//}
+	//Addrs = peers
+	Init_before()
 }
 
 // 创建组
@@ -27,14 +50,14 @@ func createGroup() *src.Group {
 	return src.NewGroup("scores", 2<<10, src.GetterFunc(
 		func(key string) ([]byte, error) {
 			log.Println("[SlowDB] search key", key)
-			if v, ok := db[key]; ok {
+			if v, ok := DB[key]; ok {
 				return []byte(v), nil
 			}
 			return nil, fmt.Errorf("%s not exist", key)
 		}))
 }
 
-// addr 本地 ，addrs peers启动缓存服务器：创建 HTTPPool，添加节点信息，注册到 group中，启动 HTTP 服务
+// addr 本地 ，Addrs peers启动缓存服务器：创建 HTTPPool，添加节点信息，注册到 group中，启动 HTTP 服务
 func startCacheServer(addr string, addrs []string, gee *src.Group) {
 	peers := src.NewHTTPPool(addr)
 	peers.Set(addrs...)
@@ -60,58 +83,17 @@ func startAPIServer(apiAddr string, gee *src.Group) {
 	log.Println("fontend server is running at", apiAddr)
 	log.Fatal(http.ListenAndServe(apiAddr[7:], nil))
 }
-func init() {
-	// 配置front-server
-	confdata := conf.NewConfigData(config_path)
-	apiAddr = confdata.GetFrontServer()
-	log.Println(apiAddr)
-	// 配置 peers
-	peers := confdata.GetPeers()
-	for _, peer := range peers {
-		parsedURL, err := url.Parse(peer)
-		if err != nil {
-			fmt.Println("Error parsing URL:", err)
-			return
-		}
 
-		// 获取端口值
-		port := parsedURL.Port()
-		if port == "" {
-			// 如果URL中没有指定端口，则使用默认端口
-			port = "80"
-		}
-		portnum, err := strconv.Atoi(port)
-		if err != nil {
-			fmt.Println("转换失败:", err)
-			return
-		}
-		addrMap[portnum] = peer
-	}
-	for _, v := range addrMap {
-		addrs = append(addrs, v)
-	}
-	online_servers = confdata.GetOnlineServers()
-	//for key, val := range addrMap {
-	//	log.Println(key, "-->", val)
-	//}
-
-}
 func main() {
 	var port int
 	var api bool
-	//for _, v := range online_servers {
-	//	println("ip:", v.IP)
-	//	println("port:", v.Port)
-	//	println("api:", v.API)
-	//}
-
 	flag.IntVar(&port, "port", 8001, "Geecache server port")
 	flag.BoolVar(&api, "api", false, "Start a api server?")
 	flag.Parse()
 	gee := createGroup()
 	if api {
 		log.Println("start API")
-		go startAPIServer(apiAddr, gee)
+		go startAPIServer(ApiAddr, gee)
 	}
-	startCacheServer(addrMap[port], []string(addrs), gee)
+	startCacheServer(AddrMap[port], []string(Addrs), gee)
 }
