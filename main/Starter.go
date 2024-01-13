@@ -30,8 +30,9 @@ func startCacheServer(addr string, addrs []string, gee *src.Group) {
 
 // 用来启动一个 API 服务（端口 9999），与用户进行交互，用户感知。
 // 主要是为了获取 key
-func startAPIServer(apiAddr string, gee *src.Group) {
-	http.Handle("/api", http.HandlerFunc(
+
+func startAPIServer(apiAddr string, gee *src.Group, mux *http.ServeMux) {
+	mux.Handle("/api", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			key := r.URL.Query().Get("key")
 			view, err := gee.Get(key)
@@ -43,5 +44,22 @@ func startAPIServer(apiAddr string, gee *src.Group) {
 			w.Write(view.ByteSlice())
 		}))
 	log.Println("fontend server is running at", apiAddr)
-	log.Fatal(http.ListenAndServe(apiAddr[7:], nil))
+	//log.Println(apiAddr[7:])
+	log.Fatal(http.ListenAndServe(apiAddr[7:], mux))
 }
+
+//func startAPIServer(apiAddr string, gee *src.Group) {
+//	http.Handle("/api", http.HandlerFunc(
+//		func(w http.ResponseWriter, r *http.Request) {
+//			key := r.URL.Query().Get("key")
+//			view, err := gee.Get(key)
+//			if err != nil {
+//				http.Error(w, err.Error(), http.StatusInternalServerError)
+//				return
+//			}
+//			w.Header().Set("Content-Type", "application/octet-stream")
+//			w.Write(view.ByteSlice())
+//		}))
+//	log.Println("fontend server is running at", apiAddr)
+//	log.Fatal(http.ListenAndServe(apiAddr[7:], nil))
+//}

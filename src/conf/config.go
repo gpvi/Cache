@@ -12,14 +12,13 @@ var default_api = false
 var default_ip = "localhost"
 
 type Server struct {
-	Port int    `yaml:"port,omitempty" default:"80"`
-	API  bool   `yaml:"api,omitempty" default:"false"`
-	IP   string `yaml:"ip,omitempty" default:"localhost"`
+	Port int    `yaml:"port" default:"80"`
+	API  bool   `yaml:"api" default:"false"`
+	IP   string `yaml:"ip" default:"localhost"`
 }
 
 type Config struct {
-	Peers       []string `yaml:"peers"`
-	FrontServer string   `yaml:"front-server omitempty" default:"http://localhost:9999"`
+	FrontServer string   `yaml:"front-server" default:"http://localhost:9999"`
 	Api         string   `yaml:"api"`
 	Servers     []Server `yaml:"online-servers"`
 }
@@ -39,9 +38,6 @@ func (c *Config) setDefaults() {
 			servers[i].Port = default_port + count_num
 		}
 		count_num++
-	}
-	if c.FrontServer == "" {
-		c.FrontServer = "http://localhost:9999"
 	}
 }
 func getConfig(configPath string) *Config {
@@ -64,7 +60,6 @@ func getConfig(configPath string) *Config {
 	}
 	// 设置默认值
 	config.setDefaults()
-
 	return &config
 
 }
